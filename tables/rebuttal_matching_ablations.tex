@@ -1,0 +1,34 @@
+\begin{table}[t!]\label{tab:ablations}
+\centering
+\resizebox{0.95\linewidth}{!}{
+\begin{tabular}{l|lll}
+\hline
+\hline
+    Method (split)            & AMOTA $\uparrow$  & Recall $\uparrow$ & MOTA $\uparrow$   \\
+    \hline
+    AB3DMOT + CP (test) & 0.387             & 0.506             & 0.284             \\
+    \hline
+    Best Hyper-parameters (test)       & \textbf{0.402}    & \textbf{0.511}    & \textbf{0.320        }     \\
+    \hline
+    $w_{iou} = 1.4 $ (validation)   & 0.403             & 0.540             & 0.322               \\
+    $w_{center} = 0.9$ (validation) & 0.417             & 0.514             & 0.332             \\
+    $w_{embedd} = 0.4$ (validation) & 0.418             & 0.558             & 0.332             \\
+    $\tau_{det} = 0.4$ (validation) & 0.397             & 0.567            & 0.326             \\
+\hline
+\hline
+\end{tabular}
+}
+\caption{\textbf{Optimized Matching and Detection Confidence.} Parameters were optimized on the nuScenes \cite{caesar2020nuscenes} validation set. On the test split our best setting with $w_{iou} = 1.4$, $w_{center} = 0.9$, $w_{embbed} = 0.4$, $\tau_{det} = 0.4$ surpasses the performance of AB3DMOT \cite{weng2020AB3DMOT}, the only baseline not trained on the dataset. Results for other baselines are given in Tab. \ref{tab:nuScenes_results}. }\label{tab:rebuttal_ablations}
+\vspace{-12pt}
+\end{table}
+
+% 1. AB3DMOT
+% 2. $w_{iou} = ...$ ..., ...
+% 3. $w_{center}$
+% 4. $w_{embedd}$
+% 5. $\tau_{det}$
+% 6. Best
+
+ 
+
+

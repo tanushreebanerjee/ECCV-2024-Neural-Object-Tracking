@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\resizebox{0.9\linewidth}{!}{
+\begin{tabular}{l|lll}
+    \hline
+    \hline
+    Method & AMOTA $\uparrow$ & Recall $\uparrow$  & MOTA$\uparrow$  \\
+    \hline
+    No Schedule & 0.102 & 0.224 & 0.110  \\
+    \hline
+    $\mathcal{L}_{RGB}$ - Eq.~\ref{eq:loss_mse} & N/A  & N/A & N/A  \\
+    $\mathcal{L}_{perceptual}$ - Eq.~\ref{eq:loss_lpips} & 0.100 & 0.251 & 0.101 \\
+    $\mathcal{L}_{IR}$ - Eq.\ref{eq:loss_mse_lpips}  & 0.103 & 0.236   & 0.112 \\
+    $\mathcal{L}_{IR}$ \& $\mathcal{L}_{embed}$ - Eq.\ref{eq:regularize}  & \textbf{0.112} & \textbf{0.264 } & \textbf{0.113} \\
+\hline
+\hline
+\end{tabular}
+}
+\caption{\todo{(a) Make split figure} \textbf{Ablation Experiments on Optimization Schedule and Loss Components.} Ablations were run on a small subset of the nuScenes~\cite{caesar2020nuscenes} validation set.  $\mathcal{L}_{RGB}$ fails due to the optimizer fitting objects to the background instead, increasing the size of each object resulting in out of memory.}
+\label{tab:optim_ablations}
+\end{table}

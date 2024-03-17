@@ -1,0 +1,12 @@
+\begin{abstract}
+Today, most methods for image understanding tasks rely on feed-forward neural networks. While this approach has allowed for empirical accuracy, efficiency, and task adaptation via fine-tuning, it also comes with fundamental disadvantages. Existing networks often struggle to generalize across different datasets, even on the same task. By design, these networks ultimately reason about high-dimensional scene features, which are challenging to analyze. This is true especially when attempting to predict 3D information based on 2D images. 
+% We propose to recast 3D multi-object tracking from RGB cameras as an \emph{Inverse Rendering (IR)} problem, by optimizing through a differentiable rendering pipeline over the latent space of pre-trained 3D object representations that best represent object instances in a given input image. 
+We propose to recast 3D multi-object tracking from RGB cameras as an \emph{Inverse Rendering (IR)} problem, by optimizing via a differentiable rendering pipeline over the latent space of pre-trained 3D object representations and retrieve the latents that best represent object instances in a given input image. 
+To this end, we optimize an image loss over generative latent spaces that inherently disentangle shape and appearance properties. We investigate not only an alternate take on tracking but our method also enables examining the generated objects, reasoning about failure situations, and resolving ambiguous cases. We validate the generalization and scaling capabilities of our method by learning the generative prior exclusively from synthetic data and assessing camera-based 3D tracking on the nuScenes and Waymo datasets. Both these datasets are completely unseen to our method and do not require fine-tuning.
+\end{abstract}
+
+\keywords{Inverse Graphics \and Neural Rendering \and Multi-Object Tracking \and Generalization.}
+
+% Especially incorrect 3D predictions from 2D images, such as depth from monocular video, 3D object tracking, and pose estimation, are often challenging to interpret. 
+
+% Not only do we investigate a new take on tracking, but our method also allows us to examine the reconstructed objects, and hence reason about failure situations and resolve ambiguous cases.

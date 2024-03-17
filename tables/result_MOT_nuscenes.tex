@@ -1,0 +1,52 @@
+\begin{table}[t!]
+\centering
+\caption{\textbf{Quantitative Evaluation for Camera-only Multi-Object Tracking}. Quantitative results on ``cars'' in the test split of the nuScenes tracking dataset~\cite{caesar2020nuscenes}. Our IR-based tracker outperforms AB3DMOT~\cite{weng2020AB3DMOT} on all metrics and CenterTrack~\cite{zhou2020CenterTrack} on accuracy. All three methods use the same detection backbone for fair comparison, while only CenterTrack requires end-to-end training on the dataset.
+Additional results show on-par performance of our method with QD-3DT~\cite{hu2021QD3DT} trained on nuScenes \cite{caesar2020nuscenes}. QD-3DT trained on the Waymo Open Dataset (WOD) does not generalize to nuScenes and does not achieve competitive results. Only very recent transformer-based methods, such as PF-Track~\cite{pang2023PFtrack} and the metric learning approach of Q-Track~\cite{yang2022qtrack} achieve a higher score. However, these methods require end-to-end training on each dataset. ``CP'' denotes here the vision-only version of CenterPoint~\cite{zhou2019CenterPointVision} was used for object detection. \textbf{Bold} denotes best and \underline{underlined} second best for methods that did not train on the dataset or use the same detection backbone.}
+\vspace*{-8pt}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{l|l|cccc|c}
+    \hline \hline
+    \textbf{Training} & \textbf{Method} & \textbf{AMOTA} $\uparrow$ &	\textbf{AMOTP} (m) $\downarrow$ &	\textbf{Recall} $\uparrow$ & \textbf{MOTA} $\uparrow$ & \textbf{Modality} \\ 
+    \textbf{Data Unseen} &  & &	& & & \\ 
+        \hline
+%%%%%%%%%%%%%%%% Table Content below
+$\times$ & PF-Track~\cite{pang2023PFtrack} & 0.622 & 0.916 & 0.719 & 0.558 & Camera \\
+$\times$ & QTrack ~\cite{yang2022qtrack} &  0.692 &  0.753 &  0.760 &  0.596 & Camera \\
+$\times$ & QD-3DT ~\cite{hu2021QD3DT} & 0.425 &1.258 &  0.563 &  0.358 & Camera \\
+\hline \hline
+\textbf{\checkmark} & QD-3DT ~\cite{hu2021QD3DT} (trained on WOD) & 0.000 & 1.893 &  0.226 &  0.000 & Camera \\
+$\times$ (CP) & CenterTrack~\cite{zhou2020CenterTrack} & 0.202 &1.195 &0.313 &0.134 & Camera \\
+\textbf{\checkmark} (CP) & AB3DMOT ~\cite{weng2020AB3DMOT} & \underline{0.387} & \textbf{1.158} & \underline{0.506} & \underline{0.284} & Camera \\
+\textbf{\checkmark} (CP) & Inverse Neural Rendering (ours) & \textbf{0.413} &  \underline{1.189} & \textbf{0.536} & \textbf{0.321} & Camera \\ % updated results as of Feb 15 2024
+
+%%%%%%%%%%%%%%%% Table Content below
+\hline \hline
+\end{tabular}
+}
+\label{tab:nuScenes_results}
+\vspace*{-14pt}
+\end{table}
+
+% results without hyper-param tuning
+% Inverse Neural Rendering (ours) + CP~\cite{zhou2019CenterPointVision} & Camera& 0.248 &  1.140 & 0.485 & 0.193 & \checkmark \\
+
+% best so far
+% AMOTA	AMOTP	RECALL	MOTAR	GT	   MOTA	  MOTP	MT	 ML	  FAF	TP	   FP	 FN	    IDS	    FRAG	TID	    LGD
+% 0.402	1.222	0.511	0.651	68518. 0.320  0.627	1281 2096 201.3	33691  11762 33509	1318	1307	1.29	2.30
+
+
+
+%     \hline \hline
+%     Method & AMOTA $\uparrow$ &	AMOTP (m) $\uparrow$ &	RECALL $\downarrow$ & MOTA $\uparrow$ &   IDS 	$\downarrow$ & No Dataset Training \\
+%      &  &	 & & & & Training \\ \hline
+% %%%%%%%%%%%%%%%% Table Content below
+% PF-Track~\cite{pang2023PFtrack} & 0.622 & 0.916 & 0.719 & 0.558 &  99 &  $\times$ \\
+% QTrack ~\cite{yang2022qtrack} &  0.692 &  0.753 &  0.760 &  0.596 & 617 &  $\times$ \\
+% QD-3DT ~\cite{hu2021QD3DT}&  0.425 &1.258 &  0.563 &  0.358 &4293 &   $\times$ \\
+% CenterTrack (Vision ~\cite{zhou2019CenterPointVision})  &0.202 &1.195 &0.313 &0.134 &2712 &  $\times$ \\
+% \hline
+% AB3DMOT + ~\cite{zhou2019CenterPointVision} & 0.387 & 1.158 & 0.506 & 0.284 &  1364 & \checkmark  \\
+% InverseRenderTrack + ~\cite{zhou2019CenterPointVision} & 0.248 &  1.140 & 0.485 & 0.193 & 2153 & \checkmark \\
+% %%%%%%%%%%%%%%%% Table Content below
+% \hline \hline
+

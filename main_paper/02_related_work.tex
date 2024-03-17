@@ -1,0 +1,65 @@
+\section{Related Work}\label{sec:related}
+\vspace{0.5\baselineskip}
+\noindent
+% \subsection{Multi-Object Scene Representation.}\label{ssec:rep}
+\noindent Object Tracking is a challenging visual inference task that requires the detection and association of multiple objects. Specific challenges include highly dynamic scenes with partial or full occlusions, changes in appearance, and varying illumination conditions~\cite{yilmaz2006object, wu2013online, smeulders2013visual}. In this section, we first review classical tracking methods and deep detection and association methods. Following, we review 3D scene representations and inverse rendering. % and methods that rely on deep learning detection and association
+
+%\vspace{0.5\baselineskip}
+%\noindent
+%\textbf{2D Object Tracking.}
+%An extensively investigated line of work proposes tracking by detection, i.e. to solve the task by first detecting scene objects and then learning to find the associations between the detected objects over multiple frames \cite{breitenstein2009robust,kalal2011tracking,bewley2016simple}. Classical methods rely on Kalman filtering for this approach ~\cite{bewley2016simple}.% and typically build on the assumption that objects have a constant speed -- an assumption that is often violated in real-world scenarios.
+%With the advent of deep learning methods and the significant progress of object detection methods \cite{ren2015faster,carion2020end}, this improvement has carried over to tracking by detection methods \cite{bergmann2019tracking}. Deep neural networks have made it possible to learn better features, resulting in an improvement in association accuracy \cite{wojke2017simple, Wojke2018deep,cao2022observation}.
+
+%Motivated by successful transformer-based methods for vision tasks ~\cite{vaswani2017attention,dosovitskiy2020image}, transformers have also been employed in tracking algorithms \cite{zeng2105motr,sun2020transtrack, meinhardt2022trackformer, cai2022memot, zhu2020deformable} to allow for better modeling of object relations. Sun et al.~\cite{sun2020transtrack} were the first to successfully employ transformers for tracking. They proposed a transformer-based encoder-decoder design to learn object and tracking queries, used for detecting objects in succeeding frames and performing association, respectively. While all methods above are efficient 2D trackers, our work focuses on 3D tracking from monocular cameras.
+
+\vspace{0.5\baselineskip}
+\noindent
+\textbf{3D Object Tracking.}
+An extensively investigated line of work proposes tracking by detection, i.e., to solve the task by first detecting scene objects and then learning to find the associations between the detected objects over multiple frames \cite{breitenstein2009robust,kalal2011tracking,bewley2016simple,bergmann2019tracking,wojke2017simple, Wojke2018deep,cao2022observation}. In addition to association, 3D tracking requires the estimation of object pose. Since directly predicting 3D object pose is challenging ~\cite{huang2021joint}, most existing 3D tracking methods rely on some explicit depth measurements in the form of Lidar point clouds~\cite{dewan2016motion,alvarez2019people, yin2021center}, hybrid camera-lidar measurements~\cite{huang2021joint} or stereo information\cite{gladkova2022directtracker,osep2017combined}. Weng \emph{et al.}~\cite{weng2020AB3DMOT} proposed a generic tracking method that combines a 3D Kalman filter and the Hungarian algorithm for matching on an arbitrary object detector. 
+
+Only recent work~\cite{hu2021QD3DT, marinello2022triplettrack, chaabane2021deft,zhou2020CenterTrack,wu2021trades} tackles monocular 3D tracking. Hu \emph{et al.}~\cite{hu2021QD3DT} relies on similarity across different viewpoints to learn rich features for tracking. DEFT~\cite{chaabane2021deft} jointly trains the feature extractor for detection and tracking using the features to match objects between frames. In contrast, Marinello \emph{et al.}~\cite{marinello2022triplettrack} use an off-the-shelf tracker and enhance image features with 3D motion and bounding box information. Zhou \emph{et al.}~\cite{zhou2020CenterTrack} rely on a minimal input of two frames and predicted heatmaps to perform simultaneous detection and tracking. %Similar to this method, we only require an initial detection in the first frame and the object appears and can perform tracking and detection in the upcoming frames. 
+Some 3D tracking methods rely on motion models~\cite{scheidegger2018mono, chen2011kalman, nguyen2004fast} such as the Kalman Filter~\cite{kalman1960new}. Recent methods also make use of 
+%, or more recently on other learned predictions based on 
+optical flow predictions~\cite{luiten2020track}, learned motion models metrics~\cite{yang2022qtrack}, long short-term memory modules (LSTM)~\cite{hu2021QD3DT, chaabane2021deft, marinello2022triplettrack} and more recently transformer modules~\cite{pang2023PFtrack, wang2023StreamPETR}.
+All the above methods rely on a feed-forward image encoder backbone to predict object features. Departing from this approach, we propose a multi-object tracking method that directly optimizes a consistent three-dimensional reconstruction of objects and 3D motion via an inverted graphics pipeline. % to track objects.
+
+\vspace{0.5\baselineskip}
+\noindent
+\textbf{3D Scene Representations, Generation and Neural Rendering.}
+%
+A growing body of work addresses joint 3D reconstruction and detection from monocular cameras. Existing methods have exploited different geometrical priors~\cite{mao2022review3dod} for this task, including meshes~\cite{beker2020monocular}, points~\cite{ku2019monocular}, wire frames~\cite{he2019mono3d++}, voxels~\cite{xiang2015voxel3dod} CAD models or implicit functions~\cite{ost2021neural} signed distance functions (SDFs)~\cite{zakharov2020autolabeling}. 
+Early approaches in neural rendering represent the scene explicitly by, e.g., encoding texture or radiance on the estimated scene geometry \cite{thies2019deferred} or using volumetric pixels (Voxels) \cite{sitzmann2019deepvoxels}. Other methods represent 3D scenes \emph{implicitly}. This includes the successful NeRF method \cite{mildenhall2020nerf} and variants that have been extended to dynamic scenes~\cite{yuan2021star,ost2021neural,park2021nerfies}.
+To allow the handling of semi-transparent objects, these representation models refrain from explicitly representing object surfaces. Signed distance fields represent surfaces of watertight objects as a zero level-set \cite{park2019deepsdf, kellnhofer2021neural, chou2022gensdf} modeling a Signed Distance Function (SDF). 
+Adding textures to surface models allows for disentangling object shape from appearance~\cite{xiang2021neutex, koestler2022intrinsic}. In recent years ideas from generative imaging models, such as GANs~\cite{karras2019styleGAN,karras2020styleGAN2}, VAEs and diffusion models~\cite{ho2020denoising,nichol2021improved} have been applied to the 3D domain ~\cite{gao2022get3d,shen2023gina3d,hao2021gancraft,chou2022gensdf}. Generative models can either be used for pure generation~\cite{shen2023gina3d} or provide prior knowledge for downstream tasks. Starting from a good prior can drastically improve the efficiency of inverse tasks, such as IR. While Gina3D~\cite{shen2023gina3d} provides a prior on in-the-wild objects its volumetric rendering pipeline adds another layer of complexity sampling the full volume. We therefore rely on GET3D~\cite{gao2022get3d} generating a mesh as a prior object model and renders through rasterization, profiting from from graphic pipelines optimized over decades. 
+%In our work, we introduce a novel texture-mapped SDF model as an efficient, i.e., optimizable, representation across object instances of the same class.
+
+% Existing methods rely on explicit, implicit, or hybrid representations of the scene. 
+% Explicit methods encode texture or radiance on recovered proxy scene geometry, such as meshes \cite{thies2019deferred}, multi-planes \cite{flynn2019DeepView,lu2020layeredNeural,mildenhall2019llff,srinivasan2019viewextrapolationmultiplaneimages,zhou2018stereo}, Voxels \cite{sitzmann2019deepvoxels} or points \cite{aliev2020neural,pittaluga2019revealing}. Instead of jointly recovering geometry and appearance, these methods can focus on recovering image details. 
+% Nonetheless, relying on explicit proxy geometry limits the achievable image quality.
+% To overcome the reliance on such geometry, researchers explored implicit representations using coordinate-based networks, e.g., the successful NeRF method \cite{mildenhall2020nerf}.
+% However, achieving photo-realistic quality for diverse tasks~\cite{martinbrualla2020nerfw, park2021nerfies, xian2021space, srinivasan2021nerv, Schwarz2020NEURIPS, Niemeyer2020GIRAFFE,ost2021neural}
+% comes at the cost of expensive training and testing. The lack of explicit geometric knowledge requires densely evaluating the implicit network within the volume, with the majority of samples located in empty space, and therefore not contributing to the rendered pixel color. Extensions \cite{garbin2021fastnerf} have tackled this issue at test time evaluation by either predicting the sampling regions \cite{neff2021donerf,arandjelovic2021nerf} or explicitly extracting proxy geometry \cite{liu2020neural} after training. DS-NeRF~\cite{deng2021depth} uses 3D key points reconstructed from COLMAP on a scene to supervise the opacity prediction with those sparse key points, which speeds up training. 
+%
+% Finally, some methods combine the two approaches into a hybrid representation~\cite{liu2020neural}.
+%
+% use a hybrid representation that stores implicit functions in a voxel grid. NeRF++ proposes to separate background and foreground scene components~\cite{zhang2020nerf++}, which helps improve the rendering quality, primarily for distant scene objects.
+% However, all of these methods \emph{struggle with large-scale outdoor scenes or scenes with very few view directions}.
+% In contrast, the proposed approach allows rendering large outdoor scenes from a sparse set of observations, by introducing a light field parameterization on sparse scene geometry. 
+
+\vspace{0.5\baselineskip}
+\noindent
+\textbf{Inverse Rendering.}
+%
+Inverse rendering methods conceptually ``invert'' the graphics rendering pipeline, which generates images from 3D scene descriptions, and instead estimates the 3D scene properties, i.e., geometry, lighting, depth, and object poses based on input images. Recent work~\cite{wang2021nerfmm,yen2021inerf,lin2021barf} successfully achieved joint optimization of a volumetric model and unknown camera poses from a set of images merely by back-propagating through a rendering pipeline. Another area of inverse rendering focuses on material and lighting properties~\cite{nimier2021material,guo2022nerfren, NimierDavidVicini2019Mitsuba2}, to find a representation that best models the observed image.
+
+To the best of our knowledge, we present the first method that employs an inverse rendering approach for multi-object 3D tracking, \emph{without any feed-forward prediction} of object features -- only given 2D image input.
+
+\begin{figure}[tb!]
+% \vspace*{-5mm}
+    \centering
+    \includegraphics[width=0.96\textwidth]{fig/overview_pipeline2.png}
+    \vspace*{-6pt}
+    \caption{\textbf{Inverse Rendering for Monocular Multi-Object Tracking.} For each detection, we initialize the embedding codes of an object generator $\mathbf{z}_S$ for shape and $\mathbf{z}_T$ for texture. The generative object prior model is frozen and only embedding codes, pose, and size of each object instance are optimized through inverse rendering to best fit the image observation. Inverse-rendered texture and shape embeddings and refined object locations are provided to the matching stage to match predicted states of tracked objects of the past and new observations. Matched and new tracklets are updated, and unmatched tracklets are ultimately discarded before predicting states in the next step.}
+    \label{fig:pipeline}
+    \vspace*{-14pt}
+\end{figure}

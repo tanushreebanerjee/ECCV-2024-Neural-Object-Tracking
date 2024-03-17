@@ -1,0 +1,79 @@
+\section{Additional Results}
+
+In the following, we present additional tracking results on the real-world datasets on which we test our method (see the evaluation section in the main paper).
+
+
+\begin{table}[t!]
+\centering
+\caption{\textbf{Tracking Matching and Detection Confidence.} Parameters were optimized on the nuScenes \cite{caesar2020nuscenes} validation set. On the test split our best setting for $w_{iou}$, $w_{center}$, $w_{embbed}$, $\tau_{det}$ surpasses the performance of AB3DMOT \cite{weng2020AB3DMOT}, the only baseline not trained on the dataset.}
+% \vspace*{-6pt}
+\resizebox{.6\linewidth}{!}{
+\begin{tabular}{l|lll}
+    \hline
+    \hline
+    Method (split) & AMOTA $\uparrow$ & Recall $\uparrow$ & MOTA $\uparrow$   \\
+    \hline
+    AB3DMOT (CP, test) & 0.387 & 0.506 & 0.284 \\
+    \hline
+    Best Hyper-param. (CP, test) & \textbf{0.413} & \textbf{0.536} & \textbf{0.321} \\
+    \hline
+    $w_{iou} = 1.4 $ (val)   & 0.403             & 0.540             & 0.322 \\
+    $w_{center} = 0.9$ (val) & 0.417             & 0.514             & 0.332 \\
+    $w_{embedd} = 0.4$ (val) & 0.418             & 0.558             & 0.332 \\
+    $\tau_{det} = 0.4$ (val) & 0.397             & 0.567            & 0.326  \\
+    \hline
+    \hline
+\end{tabular}
+}
+\label{tab:matching_ablations}
+
+\end{table}
+\subsection{Matching Ablations} Adopting the same setting as AB3DMOT~\cite{weng2020AB3DMOT}, we performed a hyper-parameter search for each matching weight and the detection confidence threshold, as denoted in Sec. 4. Our full method outperforms AB3DMOT, see Table \ref{tab:matching_ablations}, conducted on the validation split. Our best setting outperforms AB3DMOT, the only other method not trained on the dataset, by 3.9\% AMOTA on the nuScenes test split. % 0.03875968992 improvement
+
+
+\subsection{Comparison to QD-3DT} The naive quantitative evaluation of multi-object tracking methods can easily be ``unfair'' in the sense that the tracker during training may be given access to future frames or rely on an improved detector backbone (making it challenging to evaluate the tracker in isolation). Evaluating generalization requires a nuanced setup to provide a fair evaluation.
+Therefore, we decide to focus the evaluation on methods that either build on the same detector backbone~\cite{zhou2019CenterPointVision} and are not trained on the respective training set~\cite{weng2020AB3DMOT}, achieving generalization by design, or end-to-end trained tracking methods for which we use a model trained on a different dataset. Especially we evaluate a model of QD-3DT~\cite{hu2021QD3DT} that has been trained on the Waymo Open Dataset~\cite{sun2020scalability} on nuscenes~\cite{caesar2020nuscenes}. The authors of QD-3DT~\cite{hu2021QD3DT} were so kind to provide the respective checkpoints to us.
+
+
+\begin{figure}[h!]
+    \centering
+    \begin{tabular}{lcccc}
+    % {{}c@{\hskip 0.05cm}c@{\hskip 0.05cm}c@{\hskip 0.05cm}c@{\hskip 0.05cm}c{}}
+        & \multicolumn{2}{c}{INR (ours)} & \multicolumn{2}{c}{QD-3DT~\cite{hu2021QD3DT} (waymo) } \\
+
+        \rotatebox[origin=c]{90}{{\footnotesize $t$ }} &
+        \raisebox{-0.5\height}{\includegraphics[width=.22\columnwidth]{fig/comp_qd/ours_01.png}} & 
+        \raisebox{-0.5\height}{ \includegraphics[width=.22\columnwidth]{fig/comp_qd/ours_11.png}} & 
+        \raisebox{-0.5\height}{ \includegraphics[width=.22\columnwidth]{fig/comp_qd/qd3dt_01.png}} & 
+        \raisebox{-0.5\height}{ \includegraphics[width=.22\columnwidth]{fig/comp_qd/qd3dt_11.png}} \\ [0.45cm]
+        
+        \rotatebox[origin=c]{90}{{\footnotesize $t+1$}} &
+        \raisebox{-0.5\height}{ \includegraphics[width=.22\columnwidth]{fig/comp_qd/ours_02.png}} & 
+        \raisebox{-0.5\height}{ \includegraphics[width=.22\columnwidth]{fig/comp_qd/ours_12.png}} &
+        \raisebox{-0.5\height}{ \includegraphics[width=.22\columnwidth]{fig/comp_qd/qd3dt_02.png}} & 
+        \raisebox{-0.5\height}{ \includegraphics[width=.22\columnwidth]{fig/comp_qd/qd3dt_12.png}} \\ [0.45cm]
+        & (a) & (b) & (a) & (b) \\
+    \end{tabular}
+    \caption{\textbf{Qualitative Comparison on Generalization.} We compare 3D bounding box outputs from QD-3DT~\cite{hu2021QD3DT} trained on waymo~\cite{sun2020scalability} and our inverse neural rendering based tracker (INR) overlayed on the respective input videos from nuscenes~\cite{caesar2020nuscenes}. The same color in consecutive frames denote same tracklet. As we see in scene (a) on the left side QD-3DT is having ID switches especially in the far range and on the sides of a frame implying dataset specific performance caps, e.g. the training dataset has been tracking annotated in a rather short range. Another finding is examplified in scene (b) on the right side were the tracker does not generalize well and is loosing a tracklet.}
+    \label{tab:qd_3dt}
+\end{figure}
+
+Fig.~\ref{tab:qd_3dt} shows tracking results from our method along with results from QD-3DT. A visual, qualitative inspection illustrates that the end-to-end trained tracking method QD-3DT~\cite{sun2020scalability} still performs well on objects in the center of the scene but does not generalize well on occluded or partially visible objects. This is reflected in the scores reported in Tab. 1 of the main manuscript.
+
+
+
+
+
+\subsection{Additional Results on nuScenes} Although the nuScenes~\cite{caesar2020nuscenes} dataset consists of sensor data from 6 cameras, 5 radars, and 1 lidar, we tackle monocular camera-based 3D object tracking in this work. As such, we only use the data collected from the 6 cameras. The dataset comprises 1000 scenes, with each scene being 20s long. The test set contains 150 scenes. Each of these scenes is selected to be \textit{interesting}, which include scenes with high traffic density (e.g., intersections, construction sites), rare classes (e.g. ambulances, animals), potentially dangerous traffic situations (e.g., jaywalkers, incorrect behavior), maneuvers (e.g., lane change, turning, stopping) and situations that may be difficult for an Autonomous Vehicle. Additional results of our method on the nuScenes dataset are listed in Fig.~\ref{fig:additional_nuScenes_results}. We note that the colors of the cars are matched quite accurately.
+Moreover, the shapes of the cars get reconstructed as well. In turn, we can see that the tracking quality is high as visualized by bounding boxes. Note that the color of bounding boxes marks the same instance in consecutive frames. 
+% \todo{describe the results.}
+
+\subsection{Additional Results on Waymo Open Dataset} The Waymo Open Dataset~\cite{sun2020scalability} consists of 1150 scenes that each span 20s. Again, since we tackle monocular tracking, we only use the data from the 5 camera sensors. The dataset was collected by driving in Phoenix AZ, Mountain View CA, and San Francisco CA across daytime, nighttime, and dawn lighting conditions. Additional results of our method on the Waymo Open dataset are given in Figure \ref{fig:additional_waymo_results}. We find that our method generalizes effectively to this dataset. The colors of the cars are matched quite accurately, as shown in Figure \ref{fig:additional_waymo_results}. Moreover, the shapes of the cars get reconstructed as well. As such, again, tracking quality is high as visualized by bounding boxes. Note that the color of bounding boxes marks the same instance in consecutive frames. 
+% ~\todo{Actually describe results.}
+\input{tables/fig_additional_nuscenes_results}
+\input{tables/fig_additional_waymo_results}
+
+
+
+% \todo{Add at least a page of nuScenes results and a page of Waymo results.
+% Describe additional results.}

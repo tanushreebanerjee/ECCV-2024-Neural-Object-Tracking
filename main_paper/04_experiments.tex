@@ -1,0 +1,108 @@
+\subsection{Implementation Details}\label{ssec:optim}
+% \vspace{0.5\baselineskip}
+\noindent
+\textbf{Representation Model.} 
+We employ the GET3D~\cite{gao2022get3d} architecture as object model $G$. Following StyleGAN~\cite{karras2019styleGAN,karras2020styleGAN2} embeddings $z_{T}$ and $z_{S}$ are mapped to intermediate style embeddings $\boldmath{w}_S$ and $\boldmath{w}_T$ in a learned $\boldmath{W}\text{-space}$, which we optimize over instead of $\boldmath{Z}\text{-space}$. Style embeddings condition a generator function that produces tri-planes representing object shapes as Signed Distance Fields (SDFs) and textures as texture fields. We deliberately \emph{train our generator on synthetic data only}, see experiments below. Differentiable marching tetrahedra previously introduced in DMTet~\cite{shen2021dmtet} extract a mesh representation and Images are rendered with a differentiable rasterizer~\cite{laine2020modular}.
+
+\vspace{0.5\baselineskip}
+\noindent
+\textbf{Computational Cost.}
+%
+Each IR optimization step in our implementation takes $\sim$ 0.3 seconds per frame. The generation and gradient computation through the generator determines the computational cost of the method. However, we note that the rendering pipeline, contributing the majority of the computational cost of the generator, has not been performance-optimized and can be naively parallelized when implemented in lower-level GL+CUDA graphics primitives.
+
+% \subsubsection{Computational Cost}
+% %
+% Each IR optimization step in our implementation takes $\sim$ 0.3 seconds per frame, with all six steps taking 1.8 seconds per frame, therefore the proposed approach does not work in real-time. The generation and gradient computation through the generator mainly determine the computational cost of the method, and we hope to see future work improve the computational cost of generative models. 
+
+\input{tables/fig_Waymo_tracking}
+\section{Experiments}\label{sec:exp}
+In the following, we assess the proposed method. Having trained our generative scene model solely on simulated data~\cite{shapenet2015}, we test the generalization capabilities on the nuScenes \cite{caesar2020nuscenes} and Waymo~\cite{sun2020scalability} dataset -- both are unseen by the method. We analyze generative outputs of the test-time optimization and compare them against existing 3D multi-object trackers ~\cite{zhou2020CenterTrack, weng2020AB3DMOT, hu2021QD3DT,wang2023StreamPETR, yang2022qtrack} on camera-only data.
+
+\subsection{Single-Shot Object Retrieval and Matching}
+% \noindent
+Although trained only on general object-centric synthetic data, ShapeNet~\cite{shapenet2015}, our method is capable of fitting a sample from the generative prior to observed objects in real datasets that match the vehicle type, color, and overall appearance closely, effectively making our method dataset-agnostic. 
+We analyze the generations during optimization in the following.
+
+\vspace{0.5\baselineskip}
+\noindent
+\textbf{Optimization.} Given an image observation and coarse detections, our method aims to find the best 3D representation, including pose and appearance, solely through inverse rendering. In Fig.~\ref{fig:optim} we analyze this iterative optimization process, following a scheduled optimization as described in Sec.~\ref{ssec:optim}. We observe that the object's color is inferred in only two steps. Further, we can observe that even though the initial pose is incorrect, rotation and translation are optimized jointly through inverse rendering together with the shape and scale of the objects, recovering from sub-optimal initial guesses. The shape representation close to the observed object is reconstructed in just 5 steps. 
+
+% Prediction of reflectance and the integration and reconstruction of realistic environmental lighting is an exciting topic for future work.
+
+\input{tables/result_MOT_nuscenes} 
+
+
+% \begin{itemize}
+%     \item Scene decomposition, including depth, segmentation, and object reconstruction on different scenes from KITTI and Waymo including Partial Occlusion, different levels of complexity (number of objects)
+%     \item Tracking compared to "Quasi-Dense 3D tracking" with 3D boxes on a variety of Waymo and KITTI Scenes
+%     \item Show a failure case of our method, demonstrating how easy it is to identify and explain/interpret.
+%     \item Generalization to other domains, e.g. model trained on ShapeNet used for tracking on WAYMO and KITTI objects on a single object
+%     \item Show the optimization process: 1. From a detection and sampled latent code to a refined object representation \& 2. From an object on one step in the tracking to a later step in the tracking process
+% \end{itemize}
+
+\subsection{Evaluation}\label{ssec:eval}
+% \noindent
+To provide a fair comparison of 3D multi-object tracking methods using monocular inputs, we compare against existing methods by running all our evaluations with the method reference code. We only evaluate methods, that consider past frames, but have no knowledge about future frames, which is a different task. While our method does not store the full history length of all images, we allow such memory techniques for other methods. We only consider purely mono-camera-based tracking methods.% following a two-staged detect and track approach. 
+We note that, in contrast to our method, most \emph{baseline methods we compare to are finetuned on the respective training set}. For all two-stage detect-and-track methods, we use CenterPoint~\cite{yin2021center} as the detection method. We compare to CenterTrack~\cite{zhou2020CenterTrack} as an established learning-based baseline, and present results of the very recent PFTrack~\cite{pang2023PFtrack}, a transformer-based tracking method, Qtrack~\cite{yang2022qtrack} as a metric learning method, and QD-3DT~\cite{hu2021QD3DT} as an LSTM-based state tracker combined with image feature matching. 
+Of all learning-based methods, only CenterTrack~\cite{zhou2020CenterTrack} allows us to evaluate tracking performance with identical detections. Finally, we compare to AB3DMOT ~\cite{weng2020AB3DMOT} that builds on an arbitrary 3D detection algorithm and combines it with a modified Kalman filter to track the state of each object. AB3DMOT~\cite{weng2020AB3DMOT} and the proposed method are the only methods that are data-agnostic in the sense that they have not seen the training dataset. For a fair evaluation of these generalization capabilities in learning-based methods, we include another version of QD-3DT solely trained on the Waymo Open Dataset~\cite{sun2020scalability} and evaluate on nuScenes~\cite{caesar2020nuscenes}.  We discuss the findings in the following.
+%, we achieve the highest scores in all metrics, see Tab.~\ref{tab:matching_ablations}, conducted on the validation split. 
+
+%This method is the most similar to our method in the sense that the Kalman filter parameters are not tuned for each dataset.
+
+
+\input{tables/fig_optimization}
+
+\vspace{0.5\baselineskip}
+\noindent
+\textbf{Validation on nuScenes.} Tab.~\ref{tab:nuScenes_results} reports quantitative results on the test split of the nuScenes tracking dataset~\cite{caesar2020nuscenes} on the car object class for all six cameras. We list results for the multi-object tracking accuracy (MOTA)~\cite{bernardin2006MOTA} metric, the AMOTA~\cite{weng2020AB3DMOT} metric, average multi-object tracking precision (AMOTP)~\cite{weng2020AB3DMOT} and recall of all methods. First, we evaluate a version of QD-3DT~\cite{hu2021QD3DT} that has been trained on the Waymo Open Dataset~\cite{sun2020scalability} (WOD) but tested on nuScenes. This experiment is reported in row four of Tab.~\ref{tab:nuScenes_results} and confirms that recent end-to-end detection and tracking methods do not perform well on unseen data (see qualitative results in the Supplementary Material). Moreover, perhaps surprisingly, even when using use the same vision-only detection backbone as in our approach, the established end-to-end trained baseline CenterTrack~\cite{zhou2020CenterTrack}, which has seen the dataset, performs worse than our method.
+Our IR-based method outperforms the general tracker AB3DMOT~\cite{weng2020AB3DMOT}. % in all metrics.
+When other methods are given access to the dataset, recent learning-based methods such as the end-to-end LSTM-based method QD-3DT~\cite{hu2021QD3DT} perform on par.  Only the most recent transformer-based methods such as PF-Track~\cite{pang2023PFtrack} and the QTrack~\cite{yang2022qtrack}, which employ a quality-based association model on a large set of learned metrics, such as heat maps and depth, achieve higher scores. Note again, that these methods, in contrast to the proposed method, have been trained on this dataset and cannot be evaluated independently of their detector performance.
+
+We visualize the rendered objects predicted by our tracking method in Fig.~\ref{fig:nuScenes_results}. We show an observed image from a single camera at time step $k = 0$, followed by rendered objects overlaid over the observed image at time step $k = 0, 1, 2 \text{ and } 3$ along with their respective bounding boxes, with color-coded tracklets. We see that our method does not lose any tracks in challenging scenarios in diverse scenes shown here, from dense urban areas to suburban traffic crossings, and handles occlusions and clutter effectively. By visualizing the rendered objects as well as analyzing the loss values, our method allows us to reason about and explain success and failure cases effectively, enabling explainable 3D object tracking. The rendered output images provide interpretable inference results that explain successful or failed matching due to shadows, appearance, shape, or pose. For example, the blue car in the IR inference in Fig.~\ref{fig:BEV3D_fig} top row was incorrectly matched due to an appearance mismatch in a shadow region. A rendering model including ambient illumination may resolve this ambiguity, see further discussion in the Supplementary Material.
+
+\vspace{0.5\baselineskip}
+\noindent
+\textbf{Interpretation.} Fig~\ref{fig:BEV3D_fig} shows the inverse rendered scene graphs in isolation and birds-eye-view tracking outputs on a layout level. Our method accurately recovers the object pose, instance type, appearance, and scale. As such, our approach directly outputs a 3D model of the full scene, i.e., layout and object instances, along with the temporal history of the scene recovered through tracking -- a rich scene representation that can be directly ingested by downstream planning and control tasks, or simulation methods to train downstream tasks. As such, the method also allows us to reason about the scene by leveraging the 3D information provided by our predicted 3D representations. The 3D locations, object orientations, and sizes recovered from such visualizations can not only enable us to explain the predictions of our object tracking method, especially in the presence of occlusions or ID switches but also be used in other downstream tasks that require rich 3D understanding, such as planning. 
+
+\input{tables/fig_nuScenes_3D_BEV}
+\vspace{0.5\baselineskip}
+\noindent
+\textbf{Validation on Waymo.}
+Next, we provide qualitative results from the 3D tracking on the validation set of WOD~\cite{sun2020scalability} in Fig.~\ref{fig:waymo_results}. The \emph{only public results} on the provided test set are presented in QD-3DT~\cite{hu2021QD3DT}, which may indicate it fails on this dataset. While the size of the dataset and its variety is of high interest for all autonomous driving tasks, Hu et al.~\cite{hu2021QD3DT} conclude that vision-only test set evaluation is not representative of a test set developed for surround view lidar data on partial unobserved camera images only. As such, we provide here qualitative results in Fig.~\ref{fig:waymo_results}, which validate that the method achieves tracking of similar quality on all datasets, providing a generalizing tracking approach. We show that our method does not lose tracks on Waymo scenes in diverse conditions.
+
+% \input{tables/tab_ablate_optim}
+\input{tables/tab_super_ablations}
+% \input{tables/fig_ablate_scheduler}
+\vspace{0.5\baselineskip}
+\noindent
+\textbf{Ablation Experiments}
+%
+As ablation experiments, we analyze the optimization schedule, the INR loss function components, and the weights of the tracker, applying them to a subset of scenes from the nuScenes validation set. We deliberately select this smaller validation set due to its increased difficulty.
+
+% \subsubsection{Loss Ablations.}
+The top row of Tab.~\ref{tab:optim_ablations} lists the quantitative results from our ablation study of the optimization scheduler. Our findings reveal a crucial insight: the strength of our method lies not in isolated loss components but in their synergistic integration. Specifically, the amalgamation of pixel-wise, perceptual, and embedding terms significantly enhances AMOTA, MOTA, and Recall metrics. 
+
+
+% \subsubsection{Optimization.}
+Moreover, the absence of an optimization schedule led to less robust matching as quantitative and qualitative results in Tab.~\ref{fig:opt_scheduler} reveal.  However, the core efficacy of our tracking method remained intact as indicated in the last row of Tab.~\ref{tab:optim_ablations}. This nuanced understanding underscores the importance of component interplay in our method. 
+
+
+% \input{tables/tab_ablate_matching}
+
+
+
+% without hyper-param tuning: 
+
+
+
+
+
+
+
+%In the following, we ablate parts of the optimization schedule and loss function and reason about respective design choices. All ablations are evaluated on a small subset of scenes from the validation set of nuScenes~\cite{caesar2020nuscenes}, resulting in slightly worse absolute numbers when compared with the test set. The results presented in Tab.~\ref{tab:ablations} provide the insight that not a single loss component is required for our method to succeed, but rather the combination of pixel-wise, perceptual, and embedding terms provide an increase in the AMOTA, MOTA, and Recall metrics. In addition, using no optimization schedule results in a less robust matching. The method does not fail, however, given that the underlying matching algorithm uses the same distance and IoU criteria to match objects. \todo{Describe in one or two sentences that all method components are validated.}
+
+
+
+%\subsubsection{Optimization.}
+%
+%\todo{Figure + Text}

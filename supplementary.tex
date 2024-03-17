@@ -1,0 +1,157 @@
+\documentclass[runningheads]{llncs}
+
+% ---------------------------------------------------------------
+% Include basic ECCV package
+ 
+% TODO REVIEW: Insert your submission number below by replacing '*****'
+% TODO FINAL: Comment out the following line for the camera-ready version
+\usepackage[review,year=2024,ID=5640]{eccv}
+% TODO FINAL: Un-comment the following line for the camera-ready version
+%\usepackage{eccv}
+
+% OPTIONAL: Un-comment the following line for a version which is easier to read
+% on small portrait-orientation screens (e.g., mobile phones, or beside other windows)
+%\usepackage[mobile]{eccv}
+
+
+% ---------------------------------------------------------------
+% Other packages
+
+% Commonly used abbreviations (\eg, \ie, \etc, \cf, \etal, etc.)
+\usepackage{eccvabbrv}
+
+% Include other packages here, before hyperref.
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{wrapfig}
+% The "axessibility" package can be found at: https://ctan.org/pkg/axessibility?lang=en
+\usepackage[accsupp]{axessibility}  % Improves PDF readability for those with disabilities.
+
+\usepackage{enumitem}
+\RequirePackage{enumitem}
+\setlist[itemize]{noitemsep,leftmargin=*,topsep=0em}
+\setlist[enumerate]{noitemsep,leftmargin=*,topsep=0em}
+
+%table of content settings
+\usepackage{adjustbox}
+\usepackage{tocloft}
+\addtolength{\cftaftertoctitleskip}{-1cm}
+\renewcommand{\cfttoctitlefont}{\hfill\Large\bfseries}
+\renewcommand{\cftaftertoctitle}{\hfill\hfill}
+%\let\oldsection\section
+%\renewcommand{\section}[1]{\oldsection*{#1}}
+% ---------------------------------------------------------------
+% Hyperref package
+
+% It is strongly recommended to use hyperref, especially for the review version.
+% Please disable hyperref *only* if you encounter grave issues.
+% hyperref with option pagebackref eases the reviewers' job, but should be disabled for the final version.
+%
+% If you comment hyperref and then uncomment it, you should delete
+% main.aux before re-running LaTeX.
+% (Or just hit 'q' on the first LaTeX run, let it finish, and you
+%  should be clear).
+
+% TODO FINAL: Comment out the following line for the camera-ready version
+\usepackage[pagebackref,breaklinks,colorlinks,linkcolor=black,citecolor=eccvblue,pdfa]{hyperref}
+% TODO FINAL: Un-comment the following line for the camera-ready version
+%\usepackage{hyperref}
+
+% Support for ORCID icon
+\usepackage{orcidlink}
+
+\newcommand{\todo}[1]{{\color{red}#1}}
+%\usepackage[]{hyperref}
+%\usepackage[pagebackref=true,breaklinks=true,colorlinks=true, linkcolor=black, bookmarks=false]{hyperref}
+\usepackage{diagbox}
+% \usepackage[table]{xcolor}
+
+\begin{document}
+
+% ---------------------------------------------------------------
+% TODO REVIEW: Replace with your title
+\title{Supplementary Material: \\ Inverse Neural Rendering\\ for Explainable Multi-Object Tracking} 
+% Paper ID 5640
+% TODO REVIEW: If the paper title is too long for the running head, you can set
+% an abbreviated paper title here. If not, comment out.
+% \titlerunning{Abbreviated paper title}
+
+% TODO FINAL: Replace with your author list. 
+% Include the authors' OCRID for the camera-ready version, if at all possible.
+\author{Julian Ost\thanks{equal contribution} %\footnote[1]{equal contribution}
+% \\ Princeton University\\
+% {\tt\small julian.ost@princeton.edu}
+\qquad
+Tanushree Banerjee\footnotemark[1] %\footnote[1]{equal contribution}
+% \\ Princeton University\\
+% {\tt\small tb21@princeton.edu}
+\qquad
+Yuval Bahat
+% \\ Princeton University\\
+% {\tt\small yuval.bahat@princeton.edu}
+\qquad
+Mario Bijelic
+% \\ Princeton University\\
+% {\tt\small mario.bijelic@princeton.edu}
+\qquad
+Felix Heide
+% \\ Princeton University\\
+% {\tt\small fheide@princeton.edu}
+\\ \\ Princeton University
+}
+
+% TODO FINAL: Replace with an abbreviated list of authors.
+\authorrunning{J. Ost, T. Banerjee, et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+
+% TODO FINAL: Replace with your institution list.
+%\institute{Princeton University, Princeton NJ 08544, USA 
+% \and
+% Springer Heidelberg, Tiergartenstr.~17, 69121 Heidelberg, Germany
+% \email{lncs@springer.com}\\
+% \url{http://www.springer.com/gp/computer-science/lncs} \and
+% ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
+% \email{\{abc,lncs\}@uni-heidelberg.de}}
+\maketitle
+
+This supplementary document provides additional information and experiments supporting the main manuscript. We list training and architecture details, further ablation experiments, and additional comparisons and analysis.
+
+\subsubsection{Supplementary Video.} In addition, we provide a supplementary video demonstrating the performance of our proposed INR-based tracking method on a sample of diverse scenes from the nuScenes \cite{caesar2020nuscenes} dataset and the Waymo Open Dataset \cite{sun2020scalability}. We overlay the observed image with the rendered objects through alpha blending with a weight of 0.4. Object renderings are defined by the averaged latent embeddings $\textbf{z}_{k,EMA}$ and the tracked object state $\textbf{y}_k$.
+
+
+%\todo{Make a table of contents.}
+\section*{Table of Contents}
+\begin{adjustbox}{minipage=\textwidth, trim=0pt -5pt 0pt 112pt, clip}
+\begingroup
+\setcounter{tocdepth}{2}
+%\setlength{\cftaftertoctitle}{-4em} % Adjust the -4em as needed
+\let\clearpage\relax % Temporarily disable \clearpage
+\tableofcontents
+\endgroup
+\end{adjustbox}
+
+% \tableofcontents
+% %\vfill\eject
+% \hfill \break
+
+\input{supplementary_materials/01_additional_method_details}
+\input{supplementary_materials/02_interpretability_of_failure_cases}
+\input{supplementary_materials/03_additional_results}
+
+% \input{tables/tab_ablate_matching}
+% \input{tables/tab_ablate_optim}
+
+
+% \clearpage  % TODO REVIEW/FINAL: This \clearpage needs to be removed from both review and camera-ready versions.
+
+
+% ---- Bibliography ----
+%
+% BibTeX users should specify bibliography style 'splncs04'.
+% References will then be sorted and formatted in the correct style.
+%
+\clearpage
+\bibliographystyle{splncs04}
+\bibliography{main}
+\end{document}
